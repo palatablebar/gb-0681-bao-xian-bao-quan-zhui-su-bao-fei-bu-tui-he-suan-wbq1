@@ -6,7 +6,15 @@ def test_all_module_pages(client):
     for mod,_ in MODULES:assert client.get('/'+mod).status_code==200
 def test_run_and_export(client):
     r=client.post('/api/runs',json={'sample':'dirty.csv'});assert r.status_code==200
-    s=r.get_json();e=client.get('/api/archive/'+s['run_id']+'/export.csv');assert e.status_code==200 and '运行清单' in e.data.decode('utf-8-sig')
+    s=r.get_json();e=client.get('/api/archive/'+s['run_id']+'/export.csv');assert e.status_code==409 and e.get_json()['code']=='NOT_PUBLISHED'
+    assert client.post('/api/runs/'+s['run_id']+'/publish',json={'version':0}).status_code==200
+    e=client.get('/api/archive/'+s['run_id']+'/export.csv');assert e.status_code==200 and '运行清单' in e.data.decode('utf-8-sig')
+def test_pending_succession_blocks_download(client):
+    s=client.post('/api/runs',json={'sample':'succession.csv'}).get_json()
+    e=client.get('/api/archive/'+s['run_id']+'/export.csv')
+    assert e.status_code==409 and e.get_json()['code']=='NOT_PUBLISHED'
+    blocked=client.post('/api/runs/'+s['run_id']+'/publish',json={'version':0})
+    assert blocked.status_code==409 and blocked.get_json()['code']=='ADJUDICATION_PENDING'
 def test_idempotent_api(client):
     a=client.post('/api/runs',json={}).get_json();b=client.post('/api/runs',json={}).get_json()
     assert a['run_id']==b['run_id'] and len(client.get('/api/runs').get_json())==1

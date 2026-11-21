@@ -20,9 +20,13 @@ docker compose up --build -d
 - 补退对账：`/m6_reconcile`、`/api/m6_reconcile`
 - 结案归档：`/m7_archive`、`/api/m7_archive`
 
+## 撤销后继
+
+撤销一条加保后，依赖它的后续加保保留在记录链中，默认进入 `待重新核验`，此时整条保障链不可发布。在 `/m3_versions` 选择“重新核验后保留”或“随上游撤销失效”后发布；发布成功后工作台与结案下载只呈现这一份保障链及其补退结果。`/api/runs/<run_id>/publish` 接受 `{"version": 1, "adjudication": {"default": "reverify"}}` 或逐条 `{"adjudication": {"00004": "void"}}`。`/api/runs/<run_id>/chain` 返回已发布链。样例 `sample_data/succession.csv` 演示该场景。
+
 ## 核心规则
 
-按保全有效日拆分责任区间，撤销回滚指向原变更；实收补退按日精确分配尾差。完整数值、边界和异常定义见 `docs/DATA-DICTIONARY.md`。
+按保全有效日拆分责任区间，撤销回滚指向原变更；后继批改默认待裁决，裁决后才进入可发布保障链；实收补退按日精确分配尾差。完整数值、边界和异常定义见 `docs/DATA-DICTIONARY.md`。
 
 ## 验证
 

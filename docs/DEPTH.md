@@ -31,6 +31,9 @@
 | TRAP-26 | 旧版本复核 | 覆盖新结论 | 事务条件更新 | `app/store.py` | `tests/test_archive.py::test_stale_review` |
 | TRAP-23 | 生效日端点 | 双计生效日 | 半开区间 | `app/modules/m4_segments/rules.py` | `tests/test_segments.py::test_halfopen_conservation` |
 | TRAP-24 | 分币尾差 | 段合计不等 | 最大余额法 | `app/modules/m5_calculate/rules.py` | `tests/test_calculate.py::test_largest_remainder_conserves` |
+| TRAP-27 | 撤销后继 | 保留无依据责任或直接删除记录 | 保留记录并默认PENDING，裁决后才能发布 | `app/modules/m3_versions/rules.py` | `tests/test_versions.py::test_successor_is_pending_by_default` |
+| TRAP-28 | 发布半途失败 | 新旧链混用 | 事务内重建校验，失败沿用既有链 | `app/store.py`、`app/publish.py` | `tests/test_publish.py::test_publish_failure_keeps_previous_chain` |
+| TRAP-29 | 同源重跑 | 重复保费/补退 | 幂等键复用批次与已发布链 | `app/manifest.py` | `tests/test_publish.py::test_same_source_rerun_is_idempotent` |
 
 ## 对账规则
 
